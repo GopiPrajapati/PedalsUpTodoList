@@ -28,10 +28,10 @@ export const removeData = async key => {
     }
 };
 
-export const clearAllData = async key => {
+export const clearAllData = async () => {
     try {
 
-        AsyncStorage.getAllKeys().then(keys => {
+        await AsyncStorage.getAllKeys().then(keys => {
             keys.forEach(key => {
                 // if (key != FCM_TOKEN) AsyncStorage.removeItem(key);
                 AsyncStorage.removeItem(key);

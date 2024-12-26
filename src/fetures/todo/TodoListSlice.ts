@@ -73,12 +73,14 @@ const todoSlice = createSlice({
             }
         },
         setAllTheTodos: (state, action: PayloadAction<any[]>) => {
-            const todos = action.payload.map(todo => ({
-                ...todo,
-                date: moment(todo.date).format('MMM DD, YYYY h:mm A'), // Format the date when setting initial data
-                // date: todo.date
-            }));
-            state.todos = todos;
+            // const todos = action.payload.map(todo => ({
+            //     ...todo,
+            //     // date: moment(todo.date).format('MMM DD, YYYY h:mm A'), // Format the date when setting initial data
+            //     // date: todo.date
+            // }));
+            // state.todos = todos;
+            state.todos = action.payload
+
         },
     },
 });

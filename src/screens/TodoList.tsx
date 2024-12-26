@@ -26,9 +26,11 @@ import {
   setAllTheTodos,
 } from '../fetures/todo/TodoListSlice';
 import {
+  clearAllData,
   formateDate,
   formatToOriginalDate,
   getData,
+  removeData,
   storeData,
 } from '../utility/utils';
 import {TODO_LIST} from '../utility/constants';
@@ -47,7 +49,7 @@ const TodoList: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // fetchDataFromAsyncStorage();
+    fetchDataFromAsyncStorage();
   }, []);
 
   const fetchDataFromAsyncStorage = async () => {
@@ -55,10 +57,7 @@ const TodoList: FC = () => {
 
     console.log('storedTodos', storedTodos);
     if (storedTodos) {
-      console.log('hello');
-      // const parsTodos = JSON.parse(storeData);
-      // console.log('hello2');
-      // dispatch(setAllTheTodos(storedTodos));
+      dispatch(setAllTheTodos(storedTodos));
     }
   };
 
@@ -112,8 +111,25 @@ const TodoList: FC = () => {
       // Update the task
       //   dispatch(editTask({id: editId, taskName, date: formattedDate}));
       dispatch(editTask({id: editId, taskName, date: date}));
+      // let filteredData = data?.filter(it => it.id !== editId);
+      console.log('date ==============>>>>>>>>>>>>.', date);
+      console.log('date ==============>>>>.', typeof date);
+      // let indexOfArray = data.findIndex(item => item.id === editId);
+      // (data[indexOfArray].date = date),
+      //   (data[indexOfArray].id = editId),
+      //   (data[indexOfArray].taskName = taskName);
+      // const val = data.splice(indexOfArray,1,);
+      const updatedData = data.map(item =>
+        item.id === editId ? {...item, taskName, date} : item,
+      );
+
+      await storeData(TODO_LIST, updatedData);
     } else {
       dispatch(addTodo({taskName, date: date, id: Date.now().toString()}));
+
+      let value = [...data, {taskName, date: date, id: Date.now().toString()}];
+
+      await storeData(TODO_LIST, value);
     }
 
     setTaskName('');
@@ -161,7 +177,7 @@ const TodoList: FC = () => {
   const handleDeletePress = async (id: number) => {
     dispatch(removeTodo(id));
     const filteredData = data?.filter(obj => obj.id !== id);
-    // await storeData(TODO_LIST, filteredData);
+    await storeData(TODO_LIST, filteredData);
   };
 
   const renderTodoList = item => {
