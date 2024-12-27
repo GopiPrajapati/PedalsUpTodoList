@@ -1,3 +1,5 @@
+import moment from 'moment';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   Image,
@@ -7,35 +9,26 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {FC, useEffect, useRef, useState} from 'react';
-import {Container} from '../components/background/Container';
-import colors from '../utility/colors';
-import MText from '../components/text/MText';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import Input from '../components/input/InputText';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import moment from 'moment';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
+import {Container} from '../components/background/Container';
+import Input from '../components/input/InputText';
+import MText from '../components/text/MText';
 import {
   addTodo,
   editTask,
   removeTodo,
   setAllTheTodos,
 } from '../fetures/todo/TodoListSlice';
-import {
-  clearAllData,
-  formateDate,
-  formatToOriginalDate,
-  getData,
-  removeData,
-  storeData,
-} from '../utility/utils';
+import colors from '../utility/colors';
 import {TODO_LIST} from '../utility/constants';
 import images from '../utility/images';
+import {formateDate, getData, storeData} from '../utility/utils';
 
 const TodoList: FC = () => {
   const timer = useRef(null);
@@ -64,7 +57,6 @@ const TodoList: FC = () => {
   const fetchDataFromAsyncStorage = async () => {
     const storedTodos = await getData(TODO_LIST);
 
-    console.log('storedTodos', storedTodos);
     if (storedTodos) {
       dispatch(setAllTheTodos(storedTodos));
     }
@@ -74,60 +66,16 @@ const TodoList: FC = () => {
     setDatePickerVisibility(false);
   };
 
-  // const handleSubmitClick = async () => {
-  //   if (!taskName || !date) {
-  //     alert('Please enter a task name and select a date.');
-  //     return;
-  //   }
-  //   if (isEditing) {
-  //     // Update the task
-  //     if (date) {
-  //       const data = formateDate(date);
-  //       dispatch(editTask({id: editId, taskName, date: data}));
-  //     }
-
-  //     const todoList = [
-  //       ...data,
-  //       {id: editId, taskName, date: formateDate(date)},
-  //     ];
-
-  //     // await storeData(TODO_LIST, todoList);
-  //     setIsEditing(false);
-  //     setEditId(null);
-  //   } else {
-  //     dispatch(addTodo({date, taskName, id: Date.now().toString()}));
-  //     // Store values in asyncStorage
-  //     const todoList = [...data, {date, taskName, id: Date.now().toString()}];
-  //     // await storeData(TODO_LIST, todoList);
-  //   }
-  //   setTaskName('');
-  //   setDate('');
-  // };
-
   const handleSubmitClick = async () => {
     if (!taskName || !date) {
       alert('Please enter a task name and select a date.');
       return;
     }
 
-    // const formattedDate = moment(date).format('MMM DD, YYYY h:mm A'); // Format the date before saving
-    // const formattedDate = moment(new Date(date)).format('MMM DD, YYYY h:mm A');
-    // console.log('formattedDate', formattedDate);
-
-    console.log('original Date ==>>', date);
-    // console.log('formattedDate Date ==>>', formattedDate);
     if (isEditing) {
       // Update the task
-      //   dispatch(editTask({id: editId, taskName, date: formattedDate}));
+
       dispatch(editTask({id: editId, taskName, date: date}));
-      // let filteredData = data?.filter(it => it.id !== editId);
-      console.log('date ==============>>>>>>>>>>>>.', date);
-      console.log('date ==============>>>>.', typeof date);
-      // let indexOfArray = data.findIndex(item => item.id === editId);
-      // (data[indexOfArray].date = date),
-      //   (data[indexOfArray].id = editId),
-      //   (data[indexOfArray].taskName = taskName);
-      // const val = data.splice(indexOfArray,1,);
       const updatedData = data.map(item =>
         item.id === editId ? {...item, taskName, date} : item,
       );
@@ -156,38 +104,35 @@ const TodoList: FC = () => {
 
   // const handleEdit = task => {
   //   setTaskName(task.taskName);
-  //   console.log('task', task);
-
-  //   // setDate(task.date);
-  //   console.log(
-  //     'formatToOriginalDate(task.date)',
-  //     formatToOriginalDate(task.date),
-  //   );
-  //   // setDate(formatToOriginalDate(task.date));
-  //   setDate(task.date);
   //   setEditId(task.id);
   //   setIsEditing(true);
-  // };
+  //   let parsedDate;
 
+  //   if (
+  //     task.date &&
+  //     moment(task.date, 'MMM DD,<ctrl3348> h:mm A', true).isValid()
+  //   ) {
+  //     // The 'true' makes it strict parsing
+  //     parsedDate = moment(task.date, 'MMM DD,<ctrl3348> h:mm A').toDate();
+  //   } else {
+  //     parsedDate = new Date(); // Provide a default date
+  //   }
+  //   setDate(parsedDate);
+  // };
   const handleEdit = task => {
     setTaskName(task.taskName);
     setEditId(task.id);
     setIsEditing(true);
-    // setDate(moment(task.date, 'MMM DD, YYYY h:mm A').toDate()); // Ensure the date is in Date format
-    let parsedDate;
 
-    if (
-      task.date &&
-      moment(task.date, 'MMM DD,<ctrl3348> h:mm A', true).isValid()
-    ) {
-      // The 'true' makes it strict parsing
-      parsedDate = moment(task.date, 'MMM DD,<ctrl3348> h:mm A').toDate();
+    // Parse the date string back to a Date object
+    let parsedDate;
+    if (task.date) {
+      parsedDate = moment(task.date).toDate(); // Use moment to parse the date
     } else {
-      console.warn('Invalid date format:', task.date); // Log the invalid date for debugging
-      parsedDate = new Date(); // Provide a default date
+      parsedDate = new Date(); // Default to the current date if none exists
     }
 
-    setDate(parsedDate);
+    setDate(parsedDate); // Set the parsed date for the picker
   };
 
   const handleDeletePress = async (id: number) => {
@@ -226,7 +171,7 @@ const TodoList: FC = () => {
     return (
       <View style={styles.flatListCon}>
         <View style={styles.row}>
-          <View style={{flex: 0.1, justifyContent: 'center'}}>
+          <View style={styles.markAsCompletedCon}>
             <TouchableOpacity
               style={styles.deleteOrEdit}
               onPress={() => {
@@ -250,16 +195,9 @@ const TodoList: FC = () => {
             </MText>
             <MText style={{color: colors.gray}} kind="small">
               {formateDate(date)}
-              {/* {date} */}
-              {/* {moment(date).format('MMM DD, YYYY h:mm A')} */}
             </MText>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              flex: 0.2,
-              alignItems: 'center',
-            }}>
+          <View style={styles.deleteAndEditCon}>
             <TouchableOpacity
               style={styles.deleteOrEdit}
               onPress={() => {
@@ -295,7 +233,7 @@ const TodoList: FC = () => {
             flexGrow: 1,
             // backgroundColor: colors.white,
           }}>
-          <View style={{}}>
+          <View>
             <View style={styles.con}>
               <MText style={styles.title} kind="h2">
                 Task List
@@ -314,19 +252,8 @@ const TodoList: FC = () => {
 
               <TouchableOpacity
                 onPress={() => setDatePickerVisibility(true)}
-                style={{
-                  backgroundColor: colors.white,
-                  marginTop: hp(2),
-                  borderRadius: hp(1),
-                  borderColor: colors.borderColor,
-                  borderWidth: hp(0.2),
-                }}>
-                <MText
-                  kind="line"
-                  style={{
-                    paddingVertical: hp(1.5),
-                    paddingHorizontal: wp(4),
-                  }}>
+                style={styles.dateSelection}>
+                <MText kind="line" style={styles.dateText}>
                   {date ? (
                     moment(date).format('lll')
                   ) : (
@@ -340,10 +267,6 @@ const TodoList: FC = () => {
                 mode="datetime"
                 isVisible={isDatePickerVisible}
                 onConfirm={date => {
-                  console.log('date', date);
-                  console.log('setDate', moment(date).format('lll'));
-                  // console.log('date', moment(date).format('DD-MM-YYYY'));
-                  // setDate(moment(date).format('lll'));
                   setDate(date);
                   setDatePickerVisibility(false);
                 }}
@@ -377,7 +300,6 @@ const styles = StyleSheet.create({
   con: {
     backgroundColor: colors.backgroundBlue,
     paddingBottom: hp(1),
-    // marginBottom: hp(1),
   },
   title: {
     fontSize: hp(3.5),
@@ -443,4 +365,21 @@ const styles = StyleSheet.create({
     height: hp(2.2),
     width: hp(2.2),
   },
+  deleteAndEditCon: {
+    flexDirection: 'row',
+    flex: 0.2,
+    alignItems: 'center',
+  },
+  dateSelection: {
+    backgroundColor: colors.white,
+    marginTop: hp(2),
+    borderRadius: hp(1),
+    borderColor: colors.borderColor,
+    borderWidth: hp(0.2),
+  },
+  dateText: {
+    paddingVertical: hp(1.5),
+    paddingHorizontal: wp(4),
+  },
+  markAsCompletedCon: {flex: 0.1, justifyContent: 'center'},
 });

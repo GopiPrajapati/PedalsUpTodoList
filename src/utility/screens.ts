@@ -1,3 +1,3 @@
 export const screens = {
-    TODO_LIST_SCREEN: 'TodoListScreen'
+    TODO_LIST: 'TodoList'
 }
