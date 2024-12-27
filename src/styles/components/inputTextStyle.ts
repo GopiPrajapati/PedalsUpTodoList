@@ -32,7 +32,8 @@ export default StyleSheet.create({
     },
     labelText: {
         // color: colors.labelColor,
-        color: colors.white,
+        color: colors.black,
+        // color: colors.white,
         marginBottom: hp(0.8),
         fontSize: hp(1.7),
         fontFamily: fonts.rubikSemiBold,

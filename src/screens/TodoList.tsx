@@ -13,10 +13,12 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {Container} from '../components/background/Container';
 import Input from '../components/input/InputText';
+import CreateTodoModal from '../components/modal/CreateTodoModal';
 import MText from '../components/text/MText';
 import {
   addTodo,
@@ -39,7 +41,10 @@ const TodoList: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] =
+    useState<boolean>(false);
+
+  const [isModalVisible, setModalVisible] = useState<boolean>();
 
   const data = useAppSelector(state => state.todo.todos);
 
@@ -100,6 +105,7 @@ const TodoList: FC = () => {
     setDate('');
     setIsEditing(false);
     setEditId(null);
+    setModalVisible(false);
   };
 
   const handleEdit = task => {
@@ -116,6 +122,7 @@ const TodoList: FC = () => {
     }
 
     setDate(parsedDate); // Set the parsed date for the picker
+    setModalVisible(true);
   };
 
   const handleDeletePress = async (id: number) => {
@@ -286,8 +293,74 @@ const TodoList: FC = () => {
               />
             </View>
           </View>
+
+          <TouchableOpacity
+            style={{position: 'absolute', bottom: 20, right: 30}}
+            onPress={() => setModalVisible(true)}>
+            <AntDesign
+              name="pluscircle"
+              style={{fontSize: hp(5.5), color: colors.red}}
+            />
+          </TouchableOpacity>
         </ScrollView>
       </View>
+      <CreateTodoModal
+        isVisible={isModalVisible}
+        onBackdropPress={() => {
+          setModalVisible(false);
+          setTaskName('');
+          setDate('');
+          setIsEditing(false);
+          setEditId(null);
+        }}
+        isBackDropPressClose={false}
+        isCrossRequired={true}
+        title={'Add Task'}
+        headerConStyle={{paddingVertical: hp(1.5)}}>
+        <View style={{}}>
+          <Input
+            hint={'Task'}
+            placeholder={'Enter Task'}
+            onChange={value => setTaskName(value)}
+            value={taskName}
+            autoCapitalize={'none'}
+            isMandatory={true}
+          />
+
+          <TouchableOpacity
+            onPress={() => setDatePickerVisibility(true)}
+            style={styles.dateSelection}>
+            <MText kind="line" style={styles.dateText}>
+              {date ? (
+                moment(date).format('lll')
+              ) : (
+                <MText color={colors.hintColor} kind="line">
+                  Select Date
+                </MText>
+              )}
+            </MText>
+          </TouchableOpacity>
+          <DateTimePickerModal
+            mode="datetime"
+            isVisible={isDatePickerVisible}
+            onConfirm={date => {
+              setDate(date);
+              setDatePickerVisibility(false);
+            }}
+            onCancel={() => hideDatePicker()}
+            maximumDate={new Date()}
+            date={date || new Date()}
+          />
+
+          <TouchableOpacity
+            style={styles.submitCon}
+            onPress={handleSubmitClick}>
+            <MText style={styles.submitText} kind="h3">
+              Submit
+            </MText>
+          </TouchableOpacity>
+        </View>
+      </CreateTodoModal>
     </Container>
   );
 };
