@@ -244,7 +244,7 @@ const TodoList: FC = () => {
     return (
       <View style={styles.con}>
         <MText style={styles.title} kind="h2">
-          Task List
+          Todo List
         </MText>
       </View>
     );
