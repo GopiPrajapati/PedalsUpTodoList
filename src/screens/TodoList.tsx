@@ -5,7 +5,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -27,6 +26,7 @@ import {
 } from '../fetures/todo/TodoListSlice';
 import colors from '../utility/colors';
 import {TODO_LIST} from '../utility/constants';
+import fonts from '../utility/fonts';
 import images from '../utility/images';
 import {formateDate, getData, storeData} from '../utility/utils';
 
@@ -102,23 +102,6 @@ const TodoList: FC = () => {
     setEditId(null);
   };
 
-  // const handleEdit = task => {
-  //   setTaskName(task.taskName);
-  //   setEditId(task.id);
-  //   setIsEditing(true);
-  //   let parsedDate;
-
-  //   if (
-  //     task.date &&
-  //     moment(task.date, 'MMM DD,<ctrl3348> h:mm A', true).isValid()
-  //   ) {
-  //     // The 'true' makes it strict parsing
-  //     parsedDate = moment(task.date, 'MMM DD,<ctrl3348> h:mm A').toDate();
-  //   } else {
-  //     parsedDate = new Date(); // Provide a default date
-  //   }
-  //   setDate(parsedDate);
-  // };
   const handleEdit = task => {
     setTaskName(task.taskName);
     setEditId(task.id);
@@ -224,6 +207,17 @@ const TodoList: FC = () => {
     );
   };
 
+  const emptyTodoListComponent = () => {
+    return (
+      <View style={styles.emptyTodoComponentCon}>
+        <MText style={styles.title}>No Todo List Found</MText>
+        <MText style={[styles.submitText, , styles.addTodoNoteText]}>
+          Add Todo Note Please
+        </MText>
+      </View>
+    );
+  };
+
   return (
     <Container>
       <View style={{flex: 1}}>
@@ -278,13 +272,17 @@ const TodoList: FC = () => {
               <TouchableOpacity
                 style={styles.submitCon}
                 onPress={handleSubmitClick}>
-                <Text style={styles.submitText}>Submit</Text>
+                <MText style={styles.submitText} kind="h3">
+                  Submit
+                </MText>
               </TouchableOpacity>
 
               <FlatList
                 data={data}
+                // data={[]}
                 keyExtractor={item => item.id}
                 renderItem={renderTodoList}
+                ListEmptyComponent={emptyTodoListComponent}
               />
             </View>
           </View>
@@ -306,30 +304,13 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     color: colors.white,
     marginHorizontal: wp(4),
+    fontFamily: fonts.rubikBold,
   },
-  checkmark: {
-    fontSize: hp(2),
-  },
-  checkmarkCon: {
-    paddingHorizontal: hp(0.6),
-    paddingVertical: hp(0.6),
-    marginVertical: hp(1),
-    borderRadius: hp(1),
-    borderColor: colors.black,
-    borderWidth: hp(0.15),
-  },
-  subTitle: {
-    marginTop: hp(2),
-    fontSize: hp(2.5),
-    textDecorationLine: 'underline',
-    // color: colors.black,
-    color: colors.black,
-  },
+
   flatListCon: {
     paddingVertical: hp(1.5),
     paddingHorizontal: wp(4),
     backgroundColor: colors.white,
-    // backgroundColor: '#846fb070',
     // backgroundColor: colors.backgroundBlue,
     marginVertical: hp(1),
     borderRadius: hp(1),
@@ -340,20 +321,21 @@ const styles = StyleSheet.create({
     // justifyContent: 'space-between',
   },
   submitCon: {
-    // backgroundColor: colors.purple,
-    backgroundColor: colors.backgroundBlue,
+    backgroundColor: colors.tileBackGroundColor2,
+    // backgroundColor: colors.backgroundBlue,
     marginVertical: hp(2),
     alignItems: 'center',
     paddingVertical: hp(1),
     borderRadius: hp(1),
   },
   submitText: {
-    fontWeight: '500',
     fontSize: hp(2.5),
     textDecorationLine: 'underline',
     color: colors.white,
+    fontFamily: fonts.rubikMedium,
   },
   taskTitle: {
+    fontFamily: fonts.rubikMedium,
     fontSize: hp(1.8),
     textDecorationLine: 'underline',
     color: colors.black,
@@ -380,6 +362,18 @@ const styles = StyleSheet.create({
   dateText: {
     paddingVertical: hp(1.5),
     paddingHorizontal: wp(4),
+    fontFamily: fonts.rubikMedium,
   },
   markAsCompletedCon: {flex: 0.1, justifyContent: 'center'},
+  addTodoNoteText: {
+    fontSize: hp(2),
+    textAlign: 'center',
+    marginTop: hp(1),
+  },
+  emptyTodoComponentCon: {
+    height: hp(40),
+    width: wp(100),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

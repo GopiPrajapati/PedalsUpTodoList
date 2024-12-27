@@ -2,8 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import colors from "../../utility/colors";
-
-// import fonts from "../utils/fonts";
+import fonts from "../../utility/fonts";
 
 export default StyleSheet.create({
     inputCon: {
@@ -23,8 +22,7 @@ export default StyleSheet.create({
     },
     input: {
         fontSize: hp(1.8),
-        // fontFamily: fonts.rubikRegular,
-        // color: colors.focusedColor,
+        fontFamily: fonts.rubikMedium,
         color: colors.black,
         textAlignVertical: 'center',
         paddingVertical: hp(1.4),
@@ -37,7 +35,7 @@ export default StyleSheet.create({
         color: colors.white,
         marginBottom: hp(0.8),
         fontSize: hp(1.7),
-        // fontFamily: fonts.rubikRegular,
+        fontFamily: fonts.rubikSemiBold,
     },
     error: {
         marginTop: hp(1.5),
