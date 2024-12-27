@@ -5,7 +5,8 @@ export interface TodoListState {
     todos: [{
         id: number,
         taskName: string,
-        date: string
+        date: string,
+        isMarkedCompleted: boolean
     }]
 }
 
@@ -52,11 +53,10 @@ const todoSlice = createSlice({
     initialState,
     reducers: {
         addTodo(state, action) {
-            const { id, taskName, date } = action.payload;
-            console.log('Aloks', date)
+            const { id, taskName, date, isMarkedCompleted } = action.payload;
             // const formattedDate = moment(date).format('MMM DD, YYYY h:mm A'); // Format the date correctly
             // state.todos.push({ id, taskName, date: date });
-            state.todos.push({ id, taskName, date: date });
+            state.todos.push({ id, taskName, date: date, isMarkedCompleted });
         },
         removeTodo(state, action) {
             state.todos = state.todos.filter(obj => obj.id !== action.payload);

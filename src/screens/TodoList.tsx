@@ -1,12 +1,13 @@
 import {
   FlatList,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {Container} from '../components/background/Container';
 import colors from '../utility/colors';
 import MText from '../components/text/MText';
@@ -34,8 +35,11 @@ import {
   storeData,
 } from '../utility/utils';
 import {TODO_LIST} from '../utility/constants';
+import images from '../utility/images';
 
 const TodoList: FC = () => {
+  const timer = useRef(null);
+
   const [taskName, setTaskName] = useState('');
   const [date, setDate] = useState<Date | string>('');
 
@@ -50,6 +54,11 @@ const TodoList: FC = () => {
 
   useEffect(() => {
     fetchDataFromAsyncStorage();
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+    };
   }, []);
 
   const fetchDataFromAsyncStorage = async () => {
@@ -125,7 +134,14 @@ const TodoList: FC = () => {
 
       await storeData(TODO_LIST, updatedData);
     } else {
-      dispatch(addTodo({taskName, date: date, id: Date.now().toString()}));
+      dispatch(
+        addTodo({
+          taskName,
+          date: date,
+          id: Date.now().toString(),
+          isMarkedCompleted: false,
+        }),
+      );
 
       let value = [...data, {taskName, date: date, id: Date.now().toString()}];
 
@@ -179,14 +195,55 @@ const TodoList: FC = () => {
     const filteredData = data?.filter(obj => obj.id !== id);
     await storeData(TODO_LIST, filteredData);
   };
+  const handleMarkAsCompleteClicked = id => {
+    const updatedTodos = data.map(todo =>
+      todo.id === id ? {...todo, isMarkedCompleted: true} : todo,
+    );
+    dispatch(setAllTheTodos(updatedTodos));
+
+    // Start a timer to remove the item after 1.5 seconds
+    timer.current = setTimeout(async () => {
+      dispatch(removeTodo(id));
+      const filteredTodos = updatedTodos.filter(todo => todo.id !== id);
+      await storeData(TODO_LIST, filteredTodos); // Save updated state to AsyncStorage
+    }, 1500);
+  };
+
+  const handleCancelTimer = id => {
+    // Clear the timer if it exists
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null; // Reset the timer
+    }
+    const updatedTodos = data.map(todo =>
+      todo.id === id ? {...todo, isMarkedCompleted: false} : todo,
+    );
+    dispatch(setAllTheTodos(updatedTodos)); // Update the store
+  };
 
   const renderTodoList = item => {
-    const {id, date, taskName} = item.item ?? {};
-    console.log('date', date);
+    const {id, date, taskName, isMarkedCompleted} = item.item ?? {};
     return (
       <View style={styles.flatListCon}>
         <View style={styles.row}>
-          <View style={{flex: 0.8}}>
+          <View style={{flex: 0.1, justifyContent: 'center'}}>
+            <TouchableOpacity
+              style={styles.deleteOrEdit}
+              onPress={() => {
+                if (isMarkedCompleted) {
+                  handleCancelTimer(id);
+                } else {
+                  handleMarkAsCompleteClicked(id);
+                }
+              }}>
+              {isMarkedCompleted ? (
+                <Image source={images.tick} style={styles.image} />
+              ) : (
+                <Image source={images.empty} style={styles.image} />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={{flex: 0.7}}>
             <MText style={styles.taskTitle} kind="medium">
               {String(taskName).charAt(0).toUpperCase() +
                 String(taskName).slice(1)}
@@ -381,5 +438,9 @@ const styles = StyleSheet.create({
   },
   deleteOrEdit: {
     paddingHorizontal: wp(1),
+  },
+  image: {
+    height: hp(2.2),
+    width: hp(2.2),
   },
 });
