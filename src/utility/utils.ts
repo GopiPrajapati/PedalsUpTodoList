@@ -43,17 +43,3 @@ export const clearAllData = async () => {
 };
 
 export const formateDate = (date: string | Date) => moment(date).format('lll')
-
-export const formatToOriginalDate = (date: string) => moment(date, "MMM DD, YYYY h:mm A").toDate()
-
-// export const convertToUTC = dateStrings => {
-//     return dateStrings.map(dateString => {
-//         const date = moment(dateString, 'MMM DD, YYYY h:mm A');
-
-//         if (!date.isValid()) {
-//             return "Invalid date format";
-//         }
-
-//         return date.utc().format('YYYY-MM-DDTHH:mm:ssZ');
-//     });
-// };

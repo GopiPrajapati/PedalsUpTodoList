@@ -45,7 +45,6 @@ export default {
   otpTextColor: '#0A6CC7',
   statusBarColor: '#E0EFFB',
   alternateStatusBarColor: '#F2F9FF',
-  // statusBarColor: '#F2F9FF',
   whiteBlue: '#F2F9FF',
   brown: '#63432A',
   backgroundBlue: '#0F65E5',
@@ -103,29 +102,4 @@ export default {
   backgroundColorForNegativeButton: '#FF872766',
   viewAnsColor: '#FF872730',
   purple: '#593d88',
-};
-export const labelColors = {
-  scheduled: '#0A6CC7',
-  completed: '#00B55E',
-  pending: '#FF8727',
-  cancelled: '#FF2727',
-  waiting: '#5A6577',
-  onHold: '#81634C',
-  'on-hold': '#81634C',
-  viewList: '#FF872730',
-  selected: '#00B55E',
-  running: '#0A6CC7',
-  rejected: '#FF2727',
-  interviewerRequested: '#FF2727',
-  isAssigned: '#FF2727',
-  requested: '#ffcd65',
-  changeRequested: '#17A2B8',
-  viewAnswer: '#FF872730',
-  registered: '#005EB5',
-  notAppear: '#9D5353',
-};
-
-export const requestStatusColors = {
-  requested: '#FF8727',
-  approved: '#FF2727',
-};
+}; 

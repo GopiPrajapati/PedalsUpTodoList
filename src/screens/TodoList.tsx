@@ -1,9 +1,9 @@
 import moment from 'moment';
 import React, {FC, useEffect, useRef, useState} from 'react';
 import {
+  Alert,
   FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -125,6 +125,20 @@ const TodoList: FC = () => {
     setModalVisible(true);
   };
 
+  const deleteAlert = id =>
+    Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
+      {
+        style: 'default',
+        onPress: () => handleDeletePress(id),
+        text: 'Delete',
+      },
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancelled clicked'),
+        style: 'cancel',
+      },
+    ]);
+
   const handleDeletePress = async (id: number) => {
     dispatch(removeTodo(id));
     const filteredData = data?.filter(obj => obj.id !== id);
@@ -191,7 +205,8 @@ const TodoList: FC = () => {
             <TouchableOpacity
               style={styles.deleteOrEdit}
               onPress={() => {
-                handleDeletePress(id);
+                // handleDeletePress(id);
+                deleteAlert(id);
               }}>
               <MaterialCommunityIcons
                 name="delete"
@@ -225,84 +240,36 @@ const TodoList: FC = () => {
     );
   };
 
+  const listHeaderComponent = () => {
+    return (
+      <View style={styles.con}>
+        <MText style={styles.title} kind="h2">
+          Task List
+        </MText>
+      </View>
+    );
+  };
+
   return (
     <Container>
-      <View style={{flex: 1}}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flexGrow: 1,
-            // backgroundColor: colors.white,
-          }}>
-          <View>
-            <View style={styles.con}>
-              <MText style={styles.title} kind="h2">
-                Task List
-              </MText>
-            </View>
-
-            <View style={{marginHorizontal: wp(4)}}>
-              <Input
-                hint={'Task'}
-                placeholder={'Enter Task'}
-                onChange={value => setTaskName(value)}
-                value={taskName}
-                autoCapitalize={'none'}
-                isMandatory={true}
-              />
-
-              <TouchableOpacity
-                onPress={() => setDatePickerVisibility(true)}
-                style={styles.dateSelection}>
-                <MText kind="line" style={styles.dateText}>
-                  {date ? (
-                    moment(date).format('lll')
-                  ) : (
-                    <MText color={colors.hintColor} kind="line">
-                      Select Date
-                    </MText>
-                  )}
-                </MText>
-              </TouchableOpacity>
-              <DateTimePickerModal
-                mode="datetime"
-                isVisible={isDatePickerVisible}
-                onConfirm={date => {
-                  setDate(date);
-                  setDatePickerVisibility(false);
-                }}
-                onCancel={() => hideDatePicker()}
-                maximumDate={new Date()}
-                date={date || new Date()}
-              />
-
-              <TouchableOpacity
-                style={styles.submitCon}
-                onPress={handleSubmitClick}>
-                <MText style={styles.submitText} kind="h3">
-                  Submit
-                </MText>
-              </TouchableOpacity>
-
-              <FlatList
-                data={data}
-                // data={[]}
-                keyExtractor={item => item.id}
-                renderItem={renderTodoList}
-                ListEmptyComponent={emptyTodoListComponent}
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={{position: 'absolute', bottom: 20, right: 30}}
-            onPress={() => setModalVisible(true)}>
-            <AntDesign
-              name="pluscircle"
-              style={{fontSize: hp(5.5), color: colors.red}}
+      <View style={styles.container}>
+        <View>
+          <View style={styles.flatList}>
+            <FlatList
+              data={data}
+              ListHeaderComponent={listHeaderComponent}
+              keyExtractor={item => item.id}
+              renderItem={renderTodoList}
+              ListEmptyComponent={emptyTodoListComponent}
             />
-          </TouchableOpacity>
-        </ScrollView>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.fabIconCon}
+          onPress={() => setModalVisible(true)}>
+          <AntDesign name="pluscircle" style={styles.plus} />
+        </TouchableOpacity>
       </View>
       <CreateTodoModal
         isVisible={isModalVisible}
@@ -376,7 +343,6 @@ const styles = StyleSheet.create({
     fontSize: hp(3.5),
     textDecorationLine: 'underline',
     color: colors.white,
-    marginHorizontal: wp(4),
     fontFamily: fonts.rubikBold,
   },
 
@@ -384,18 +350,15 @@ const styles = StyleSheet.create({
     paddingVertical: hp(1.5),
     paddingHorizontal: wp(4),
     backgroundColor: colors.white,
-    // backgroundColor: colors.backgroundBlue,
     marginVertical: hp(1),
     borderRadius: hp(1),
   },
   row: {
     flexDirection: 'row',
     flex: 1,
-    // justifyContent: 'space-between',
   },
   submitCon: {
     backgroundColor: colors.tileBackGroundColor2,
-    // backgroundColor: colors.backgroundBlue,
     marginVertical: hp(2),
     alignItems: 'center',
     paddingVertical: hp(1),
@@ -444,9 +407,18 @@ const styles = StyleSheet.create({
     marginTop: hp(1),
   },
   emptyTodoComponentCon: {
-    height: hp(40),
+    height: hp(80),
     width: wp(100),
     alignItems: 'center',
     justifyContent: 'center',
   },
+  fabIconCon: {position: 'absolute', bottom: 20, right: 30},
+  plus: {
+    fontSize: hp(5.5),
+    color: colors.red,
+    backgroundColor: 'white',
+    borderRadius: hp(15),
+  },
+  container: {flex: 1},
+  flatList: {marginHorizontal: wp(4)},
 });
