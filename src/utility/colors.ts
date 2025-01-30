@@ -102,4 +102,5 @@ export default {
   backgroundColorForNegativeButton: '#FF872766',
   viewAnsColor: '#FF872730',
   purple: '#593d88',
+
 }; 
